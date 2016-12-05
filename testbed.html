@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>CS 290 Workouts Table</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+<script type="text/javascript" src="./ajaxDOM.js"></script>
+
+<h1>Workouts</h1>
+
+ <table id="workouts">
+	<tr id="header">
+		<th>Name</th>
+		<th>Reps</th>
+		<th>Weight</th>
+		<th>Date</th>
+	</tr>
+</table>
+
+
+
+<br><form id="addRow"> 
+	<fieldset>
+		<legend>Add new excercise</legend>
+		<label><input type="text" name="name" id="name" size="20">Exercise Name</label><br>
+		<label><input type="text" name="reps" id="reps" size="4">No. Of Reps</label><br>
+		<label><input type="text" name="Weight" id="weight" size="4">Weight</label><br>
+		<label><input type="radio" name="lbs" id="lbs" value="1">Lbs</label><br>
+		<label><input type="radio" name="lbs" id="kgs" value="0">Kg</label><br>
+		<label><input type="date" name="date" id="date" size = "12">Date (yyyy-mm-dd)</label><br>
+		<input type="submit" name="submitRow" id="submitRow">
+		<input type="button" name="resetTable" id="resetTable" value="Reset Table">
+	</fieldset>
+</form>
+</body>
+</html>
+
+
