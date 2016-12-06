@@ -1,13 +1,8 @@
 var express = require('express');
 // var mysql = require('./dbcon.js');
-var mysql = require('mysql');
-var pool = mysql.createPool({
-  connectionLimit : 10,
-  host            : 'mysql.eecs.oregonstate.edu',
-  user            : 'cs290_wortheyt',
-  password        : '9128',
-  database        : 'cs290_wortheyt'
-});
+var mysql = require('./dbcon.js');
+
+var pool = mysql.pool;
 
 // module.exports.pool = pool;
 
@@ -24,39 +19,23 @@ app.set('view engine', 'handlebars');
 app.set('port', 3000);
 
 
-
 app.get('/',function(req,res,next){
-  var context = {};
-  
-  pool.query('SELECT * FROM workouts', function(err, rows, fields){
-	
+	var context = {};
+
+	pool.query('SELECT * FROM workouts', function(err, rows, fields){
+
 	if(err){
-	  next(err);
-	  return;
+		next(err);
+		return;
 	}
 
-	context.results = JSON.stringify(rows);
-	res.render('home', context);
-  });
+	res.header("Access-Control-Allow-Origin", "*");
+	res.type("JSON");
+	res.send(rows);
+
+	});
 
 });
-
-
-// app.get('/update', function(req, res, next) {
-
-// 	var context = {};
-
-// 	pool.query('UPDATE workouts SET name=?, reps=?, weight=?, date=?, lbs=? WHERE id=?',
-// 		[req.query.name], [req.query.reps], [req.query.weight], [req.query.date], [req.query.lbs], [req.query.id], 
-// 		function(err, result){
-// 			if (err){
-// 				next(err);
-// 				return;
-// 			}
-// 			context.results = 'Updated' + result.changedRows + ' rows.';
-// 			res.render('home', context);
-// 		});
-// });
 
 
 app.get('/update', function(req, res, next){
@@ -79,6 +58,9 @@ app.get('/update', function(req, res, next){
 					return;
 				}
 
+				res.header("Access-Control-Allow-Origin", "*");
+				res.status(200);
+
 				context.results = 'Updated ' + result.changedRows + ' rows.';
 				res.render('home', context);
 			});
@@ -88,30 +70,41 @@ app.get('/update', function(req, res, next){
 });
 
 app.get('/insert',function(req,res,next){
-  var context = {};
+	var context = {};
 
-  pool.query("INSERT INTO workouts(name, reps, weight, date, lbs) VALUES ('lifts', 10, 20, '2016-12-02', 1)", function(err, result){
-	
-		if(err){
-		  next(err);
-		  return;
-		}
+	pool.query("INSERT INTO workouts(name, reps, weight, date, lbs) VALUES (?, ?, ?, ?, ?)", [req.query.name, req.query.reps, req.query.weight, req.query.date, req.query.lbs], function(err, result){
+
+	if(err){
+	  next(err);
+	  return;
+	}
+
+	res.header("Access-Control-Allow-Origin", "*");
+	res.status(200);
 
 	context.results = "Inserted id " + result.insertId;
 	res.render('home',context);
- 
-	});
-  
- //  pool.query("INSERT INTO workouts(name, reps, weight, date, lbs) VALUES (?)", [req.query.name, req.query.reps, req.query.weight, req.query.date, req.query.lbs], function(err, result){
 
-	// if(err){
-	//   next(err);
-	//   return;
-	// }
-  
-	// context.results = "Inserted id " + result.insertId;
-	// res.render('home',context);
- //  });
+	});
+});
+
+
+app.get('/delete', function(req, res, next){
+
+	var context = {};
+
+	pool.query("DELETE FROM workouts WHERE id = ?", [req.query.id], function(err, result){
+
+		if (err){
+			next(err);
+			return;
+		}
+
+		context.results = 'Deleted' + result.id;
+		res.header("Access-Control-Allow-Origin", "*");
+		res.render('home', context);
+
+	});
 
 });
 
@@ -127,8 +120,9 @@ app.get('/reset-table',function(req,res,next){
 	"date DATE,"+
 	"lbs BOOLEAN)";
 	pool.query(createString, function(err){
-	  context.results = "Table reset";
-	  res.render('home',context);
+		context.results = "Table reset";
+		res.header("Access-Control-Allow-Origin", "*");
+		res.render('home',context);
 	})
   });
 });
